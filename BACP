@@ -1,0 +1,66 @@
+#include <iostream>
+using namespace std;
+
+const int MAX_N = 16;
+const int MAX_M = 5;
+const int INF = 1000000;
+
+int n, m;
+int c[MAX_N];
+int a[MAX_N][MAX_N];
+int res = INF;
+int assign[MAX_N];
+int load[MAX_M];
+
+bool valid(int u, int p) {
+    for (int i = 0; i < n; ++i) {
+        if (a[i][u] == 1 && assign[i] >= p) return false;
+    }
+    return true;
+}
+
+void solve(int u) {
+    if (u == n) {
+        int mx = 0;
+        for (int i = 0; i < m; ++i) {
+            if (load[i] > mx) mx = load[i];
+        }
+        if (mx < res) res = mx;
+        return;
+    }
+
+    for (int p = 0; p < m; ++p) {
+        if (valid(u, p)) {
+            assign[u] = p;
+            load[p] += c[u];
+
+            int mx = 0;
+            for (int i = 0; i < m; ++i) {
+                if (load[i] > mx) mx = load[i];
+            }
+
+            if (mx < res) solve(u + 1);
+
+            load[p] -= c[u];
+            assign[u] = -1;
+        }
+    }
+}
+
+int main() {
+    cin >> n >> m;
+    for (int i = 0; i < n; ++i) cin >> c[i];
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cin >> a[i][j];
+        }
+    }
+
+    for (int i = 0; i < n; ++i) assign[i] = -1;
+    for (int i = 0; i < m; ++i) load[i] = 0;
+
+    solve(0);
+    cout << res << endl;
+
+    return 0;
+}
